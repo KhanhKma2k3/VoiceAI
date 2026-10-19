@@ -1,0 +1,13 @@
+$id  = '371dc5fa-8897-4b45-a1d2-0879437cbe7a'
+$dir = Join-Path $env:USERPROFILE '.cloudflared'
+@"
+tunnel: voice
+credentials-file: $dir\$id.json
+ingress:
+  - hostname: api.trolyamthanh.online
+    service: http://localhost:8000
+  - hostname: relay.trolyamthanh.online
+    service: http://localhost:8080
+  - service: http_status:404
+"@ | Set-Content -Path (Join-Path $dir 'config.yml') -Encoding ASCII
+Test-Path (Join-Path $dir 'config.yml')

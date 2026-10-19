@@ -1,0 +1,19 @@
+# Bí mật - KHÔNG commit
+.env
+
+# Database local
+*.db
+*.sqlite3
+
+# File audio sinh ra lúc chạy
+outputs/*.mp3
+uploads/*
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
+
+# Test
+.pytest_cache/

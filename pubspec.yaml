@@ -1,0 +1,36 @@
+name: voice_assistant
+description: "A new Flutter project."
+publish_to: 'none'
+version: 1.0.0+1
+
+environment:
+  sdk: ^3.12.1
+
+dependencies:
+  animated_text_kit: ^4.3.0
+  audio_waveforms: ^2.0.2
+  flutter:
+    sdk: flutter
+
+  flutter_animate: ^4.5.2
+  font_awesome_flutter: ^11.0.0
+  http: ^1.5.0
+  just_audio: ^0.10.4
+  just_audio_windows: ^0.2.2
+  path_provider: ^2.1.5
+  record: ^6.0.0
+  shared_preferences: ^2.5.5
+  web_socket_channel: ^2.4.0
+  path: ^1.9.0
+  google_sign_in: ^6.2.1
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+
+  flutter_lints: ^6.0.0
+flutter:
+  uses-material-design: true
+
+  assets:
+    - assets/models/vosk-model-small-vn-0.4.zip
