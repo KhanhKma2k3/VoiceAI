@@ -46,6 +46,25 @@ class PcVoiceCommandParser {
     'tắt ',
   ];
 
+  // Lỗi STT nghe nhầm thường gặp -> cụm đúng (bổ sung dần theo thực tế).
+  static const _phraseFixes = {
+    'cái đặt': 'cài đặt',
+    'cải đặt': 'cài đặt',
+    'cài đạt': 'cài đặt',
+    'cài đật': 'cài đặt',
+    'mỡ ': 'mở ',
+    'mơ ': 'mở ',
+    'mợ ': 'mở ',
+    'mờ ': 'mở ',
+    'má ': 'mở ',
+    'mà ': 'mở ',
+  };
+
+  // Từ đệm cuối câu, bỏ đi để lấy đúng tên ứng dụng ("mở zalo lên đi").
+  static const _fillerTail = [
+    ' lên đi', ' lên', ' đi', ' giúp tôi', ' giùm tôi', ' cho tôi', ' nhé', ' nha', ' với', ' ra',
+  ];
+
   /// Trả về `null` nếu không nhận diện được câu lệnh nào phù hợp.
   static VoicePcCommand? parse(String rawText) {
     final text = _normalize(rawText);
@@ -140,8 +159,15 @@ class PcVoiceCommandParser {
 
   static String _normalize(String text) {
     var t = text.toLowerCase().trim();
-    // Bỏ dấu câu cuối câu do STT đôi khi thêm vào (vd: "mở chrome.").
-    t = t.replaceAll(RegExp(r'[.!?]+$'), '').trim();
+    t = t.replaceAll(RegExp(r'[.!?,]+$'), '').trim();
+    _phraseFixes.forEach((wrong, right) {
+      if (wrong.endsWith(' ')) {
+        // Tiền tố: chỉ sửa khi đứng ĐẦU câu.
+        if (t.startsWith(wrong)) t = right + t.substring(wrong.length);
+      } else {
+        t = t.replaceAll(wrong, right);
+      }
+    });
     return t;
   }
 
@@ -156,7 +182,20 @@ class PcVoiceCommandParser {
       if (text.startsWith(prefix)) {
         final rest = text.substring(prefix.length).trim();
         // Bỏ thêm chữ "ứng dụng"/"app" lỡ còn sót lại (vd: "mở cho tôi ứng dụng chrome").
-        return rest.replaceFirst(RegExp(r'^(cho tôi\s+)?(ứng dụng\s+|app\s+)?'), '').trim();
+        var name = rest.replaceFirst(RegExp(r'^(cho tôi\s+)?(ứng dụng\s+|app\s+)?'), '').trim();
+        // Bỏ từ đệm cuối câu ("zalo lên đi" -> "zalo"). Chỉ làm ở đây để
+        // không làm hỏng cụm media như "to lên", "âm lượng lên".
+        var changed = true;
+        while (changed) {
+          changed = false;
+          for (final f in _fillerTail) {
+            if (name.endsWith(f)) {
+              name = name.substring(0, name.length - f.length).trim();
+              changed = true;
+            }
+          }
+        }
+        return name;
       }
     }
     return null;
